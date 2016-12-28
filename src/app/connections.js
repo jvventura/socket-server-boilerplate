@@ -25,13 +25,13 @@ class Connector extends events.EventEmitter {
 	}
 
 	// 'Public' methods.
-	
+
 	db() {
 		_ready();
 		return; // connect to some db to hold events (cassandra?)
 	}
 
-	job() {
+	queue() {
 		return jackrabbit(this.urls.jackrabbit)
 		.on('connected', function() {
 			logger.log('info', 'Jackrabbit connected.');
