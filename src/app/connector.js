@@ -34,14 +34,14 @@ class Connector extends events.EventEmitter {
 	queue() {
 		return jackrabbit(this.urls.jackrabbit)
 		.on('connected', function() {
-			logger.log('info', 'Jackrabbit connected.');
+			logger.log('info', 'Connector: Jackrabbit connected.');
 			_ready();
 		})
 		.on('error', function(err) {
 			logger.log('error', err);
 		})
 		.on('disconnected', function() {
-			logger.log('info', 'Jackrabbit disconnected.');
+			logger.log('info', 'Connector: Jackrabbit disconnected.');
 			_lost();
 		});
 	}
