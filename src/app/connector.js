@@ -9,6 +9,9 @@ class Connector extends events.EventEmitter {
 		super();
 		this.count = 2;
 		this.urls = urls || {};
+
+		this.db = this.mongoose();
+		this.queue = this.jackrabbit();
 	}
 
 
@@ -28,7 +31,7 @@ class Connector extends events.EventEmitter {
 
 	// 'Public' methods.
 
-	db() {
+	mongoose() {
 		let self = this;
 
 		return mongoose.connect(this.urls.mongoose)
@@ -44,7 +47,7 @@ class Connector extends events.EventEmitter {
 		})
 	}
 
-	queue() {
+	jackrabbit() {
 		let self = this;
 
 		return jackrabbit(this.urls.jackrabbit)

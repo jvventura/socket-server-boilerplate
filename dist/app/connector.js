@@ -32,13 +32,13 @@ var _events = require('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _jackrabbit = require('jackrabbit');
+var _jackrabbit2 = require('jackrabbit');
 
-var _jackrabbit2 = _interopRequireDefault(_jackrabbit);
+var _jackrabbit3 = _interopRequireDefault(_jackrabbit2);
 
-var _mongoose = require('mongoose');
+var _mongoose2 = require('mongoose');
 
-var _mongoose2 = _interopRequireDefault(_mongoose);
+var _mongoose3 = _interopRequireDefault(_mongoose2);
 
 var _logger = require('../modules/logger');
 
@@ -56,6 +56,9 @@ var Connector = function (_events$EventEmitter) {
 
 		_this.count = 2;
 		_this.urls = urls || {};
+
+		_this.db = _this.mongoose();
+		_this.queue = _this.jackrabbit();
 		return _this;
 	}
 
@@ -79,11 +82,11 @@ var Connector = function (_events$EventEmitter) {
 		// 'Public' methods.
 
 	}, {
-		key: 'db',
-		value: function db() {
+		key: 'mongoose',
+		value: function mongoose() {
 			var self = this;
 
-			return _mongoose2.default.connect(this.urls.mongoose).on('connected', function () {
+			return _mongoose3.default.connect(this.urls.mongoose).on('connected', function () {
 				_logger2.default.log('info', 'Connector: Mongoose connected.');
 				self._ready();
 			}).on('error', function (err) {
@@ -93,11 +96,11 @@ var Connector = function (_events$EventEmitter) {
 			});
 		}
 	}, {
-		key: 'queue',
-		value: function queue() {
+		key: 'jackrabbit',
+		value: function jackrabbit() {
 			var self = this;
 
-			return (0, _jackrabbit2.default)(this.urls.jackrabbit).on('connected', function () {
+			return (0, _jackrabbit3.default)(this.urls.jackrabbit).on('connected', function () {
 				_logger2.default.log('info', 'Connector: Jackrabbit connected.');
 				self._ready();
 			}).on('error', function (err) {
