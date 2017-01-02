@@ -64,8 +64,14 @@ var App = function (_events$EventEmitter) {
 	(0, _createClass3.default)(App, [{
 		key: '_onConnected',
 		value: function _onConnected() {
-			this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
-			this.connections.queue.create(this._onReady); // create the queue then emit ready event
+			/*
+   this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
+   */
+			var self = this;
+
+			this.connections.queue.create('jobs.event', { prefetch: 5 }, function () {
+				self._onReady();
+			});
 		}
 	}, {
 		key: '_onReady',

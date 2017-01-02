@@ -18,8 +18,14 @@ class App extends events.EventEmitter {
 	// 'Private' methods.
 
 	_onConnected() {
+		/*
 		this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
-		this.connections.queue.create(this._onReady); // create the queue then emit ready event
+		*/
+		let self = this;
+
+		this.connections.queue.create('jobs.event', { prefetch: 5 }, () => {
+			self._onReady();
+		});
 	}
 
 	_onReady() {
