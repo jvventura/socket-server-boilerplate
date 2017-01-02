@@ -1,23 +1,43 @@
 import http from 'http';
-import express from 'express';
-import socketio from 'socket.io';
+import throng from 'throng';
 
-import sessions from './modules/sessions';
-import sharedSession from 'express-socket.io-session';
+import App from './app';
+import Web from './web';
 
-// Instantiate server.
-let web = express();
-let server = http.createServer(web);
-let io = socketio(server);
+import logger from './modules/logger';
 
-// Connect to RedisStore for sessions.
-let session = sessions(process.env.REDISCLOUD_URL);
-web.use(session);
-web.use(cookieParser());
-io.use(sharedsession(session, {
-    autoSave:true
-}));
+http.globalAgent.maxSockets = Infinity;
+throng(start);
 
-// Start server.
-let port = process.env.PORT || 5000;
-server.listen(port);
+function start() {
+	logger.log('info', 'Starting server.');
+
+	let instance = App();
+
+	instance.on('ready', createServer);
+	instance.on('lost', abort);
+
+	function createServer() {
+		// If THRIFTY mode, process will act as both publisher and consumer.
+		if (process.env.THRIFTY) instance.process();
+
+		let server = Web(instance);
+		process.on('SIGTERM', shutdown);
+		instance
+		.removeListener('lost', abort)
+		.on('lost', shutdown);
+
+		function shutdown() {
+			logger.log('info', 'Server shutting down.');
+			server.close(function() {
+				logger.log('info', 'Server shutdown.');
+				process.exit();
+			});
+		}
+	}
+
+	function abort() {
+		logger.log('info', 'Server abort.');
+		process.exit();
+	}
+}

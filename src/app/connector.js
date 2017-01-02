@@ -1,5 +1,7 @@
 import events from 'events';
 import jackrabbit from 'jackrabbit';
+import mongoose from 'mongoose';
+
 import logger from '../modules/logger';
 
 class Connector extends events.EventEmitter {
@@ -27,22 +29,35 @@ class Connector extends events.EventEmitter {
 	// 'Public' methods.
 
 	db() {
-		_ready();
-		return; // connect to some db to hold events (cassandra?)
+		let self = this;
+
+		return mongoose.connect(this.urls.mongoose)
+		.on('connected', () => {  
+			logger.log('info', 'Connector: Mongoose connected.');
+			self._ready();
+		})
+		.on('error', err => {
+			logger.log('error', err);
+		})
+		.on('disconnected', () => {
+			logger.log('info', 'Connector: Mongoose disconnected.');
+		})
 	}
 
 	queue() {
+		let self = this;
+
 		return jackrabbit(this.urls.jackrabbit)
-		.on('connected', function() {
+		.on('connected', () => {
 			logger.log('info', 'Connector: Jackrabbit connected.');
-			_ready();
+			self._ready();
 		})
-		.on('error', function(err) {
+		.on('error', err => {
 			logger.log('error', err);
 		})
-		.on('disconnected', function() {
+		.on('disconnected', () => {
 			logger.log('info', 'Connector: Jackrabbit disconnected.');
-			_lost();
+			self._lost();
 		});
 	}
 

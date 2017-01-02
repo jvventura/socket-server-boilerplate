@@ -8,11 +8,11 @@ class App extends events.EventEmitter {
 		super();
 
 		this.connections = connections({
-			jackrabbit: process.env.CLOUDAMQP_URL
+			jackrabbit: process.env.CLOUDAMQP_URL,
+			mongoose: process.env.MONGODB_URI
 		});
 
 		this.connections.on('ready', this._onConnected);
-
 	}
 
 	// 'Private' methods.
@@ -35,12 +35,17 @@ class App extends events.EventEmitter {
 	// 'Public' methods.
 		// process event (pass msg data to queue for worker)
 
-	queueData(data) {
-		this.connections.queue.publish(); // add the msg to the queue with the data
+	queue(data) {
+		this.connections.queue.publish('jobs.event', data);
 	}
 
-	processData(data) {
-		this.Events.new(); // create and save a new Event into the db
-		logger.log('info', 'App: Event saved.', data);
+	process() {
+		this.connections.handle('jobs.event', (job, ack) => {
+			logger.log('info', job);
+		});
 	}
+}
+
+export default function() {
+	return new App();
 }
