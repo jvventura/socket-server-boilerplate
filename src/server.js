@@ -10,7 +10,7 @@ http.globalAgent.maxSockets = Infinity;
 throng(start);
 
 function start() {
-	logger.log('info', 'Starting server.');
+	logger.log('info', 'Attempting to starting server.');
 
 	let instance = App();
 
