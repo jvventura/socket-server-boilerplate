@@ -26,7 +26,7 @@ _http2.default.globalAgent.maxSockets = Infinity;
 (0, _throng2.default)(start);
 
 function start() {
-	_logger2.default.log('info', 'Starting server.');
+	_logger2.default.log('info', 'Attempting to starting server.');
 
 	var instance = (0, _app2.default)();
 
@@ -34,6 +34,9 @@ function start() {
 	instance.on('lost', abort);
 
 	function createServer() {
+		// If THRIFTY mode, process will act as both publisher and consumer.
+		if (process.env.THRIFTY) instance.process();
+
 		var server = (0, _web2.default)(instance);
 		process.on('SIGTERM', shutdown);
 		instance.removeListener('lost', abort).on('lost', shutdown);
