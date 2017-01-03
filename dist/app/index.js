@@ -68,7 +68,7 @@ var App = function (_events$EventEmitter) {
    this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
    */
 			var self = this;
-
+			console.log(this.connections);
 			this.connections.queue.create('jobs.event', { prefetch: 5 }, function () {
 				self._onReady();
 			});
