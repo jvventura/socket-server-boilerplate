@@ -49,10 +49,6 @@ function Web(app) {
 
 	});
 
-	setInterval(() => {
-		app.queue({event: 'interval'});
-	}, 5000);
-
 	// Start server.
 	let port = process.env.PORT || 5000;
 	server.listen(port, () => {
