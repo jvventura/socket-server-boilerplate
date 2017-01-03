@@ -23,6 +23,8 @@ class App extends events.EventEmitter {
 		*/
 		let self = this;
 
+		logger.log('info', this.connections.queue);
+
 		this.connections.queue.queue({
 			name: 'jobs.event',
 			prefetch: 5,

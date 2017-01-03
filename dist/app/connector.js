@@ -104,12 +104,15 @@ var Connector = function (_events$EventEmitter) {
 		value: function jackrabbit() {
 			var self = this;
 
-			var rabbit = (0, _jackrabbit3.default)(this.urls.jackrabbit).on('connected', function () {
+			var rabbit = (0, _jackrabbit3.default)(this.urls.jackrabbit);
+			rabbit.on('connected', function () {
 				_logger2.default.log('info', 'Connector: Jackrabbit connected.');
 				self._ready();
-			}).on('error', function (err) {
+			});
+			rabbit.on('error', function (err) {
 				_logger2.default.log('error', err);
-			}).on('disconnected', function () {
+			});
+			rabbit.on('disconnected', function () {
 				_logger2.default.log('info', 'Connector: Jackrabbit disconnected.');
 				self._lost();
 			});

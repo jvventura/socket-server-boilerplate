@@ -69,6 +69,8 @@ var App = function (_events$EventEmitter) {
    */
 			var self = this;
 
+			_logger2.default.log('info', this.connections.queue);
+
 			this.connections.queue.queue({
 				name: 'jobs.event',
 				prefetch: 5,
