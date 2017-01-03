@@ -25,7 +25,7 @@ class App extends events.EventEmitter {
 
 		logger.log('info', this.connections.queue);
 
-		this.connections.queue.queue({
+		this.connections.queue.create({
 			name: 'jobs.event',
 			prefetch: 5,
 			durabe: true

@@ -71,7 +71,7 @@ var App = function (_events$EventEmitter) {
 
 			_logger2.default.log('info', this.connections.queue);
 
-			this.connections.queue.queue({
+			this.connections.queue.create({
 				name: 'jobs.event',
 				prefetch: 5,
 				durabe: true
