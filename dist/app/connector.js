@@ -68,7 +68,7 @@ var Connector = function (_events$EventEmitter) {
 		key: '_ready',
 		value: function _ready() {
 			// Connection ready!
-			if (--this.count) {
+			if (--this.count == 0) {
 				this.emit('ready');
 			}
 		}

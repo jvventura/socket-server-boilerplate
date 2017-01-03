@@ -19,7 +19,7 @@ class Connector extends events.EventEmitter {
 
 	_ready() {
 		// Connection ready!
-		if (--this.count) {
+		if (--this.count == 0) {
 			this.emit('ready');
 		}
 	}
