@@ -74,10 +74,6 @@ function Web(app) {
 		app.queue({ event: 'socket_connection' });
 	});
 
-	setInterval(function () {
-		app.queue({ event: 'interval' });
-	}, 5000);
-
 	// Start server.
 	var port = process.env.PORT || 5000;
 	server.listen(port, function () {
