@@ -88,14 +88,14 @@ var Connector = function (_events$EventEmitter) {
 
 			_mongoose3.default.connect(this.urls.mongoose);
 
-			_mongoose3.default.conenction.on('connected', function () {
+			_mongoose3.default.connection.on('connected', function () {
 				_logger2.default.log('info', 'Connector: Mongoose connected.');
 				self._ready();
 			});
-			_mongoose3.default.conenction.on('error', function (err) {
+			_mongoose3.default.connection.on('error', function (err) {
 				_logger2.default.log('error', err);
 			});
-			_mongoose3.default.conenction.on('disconnected', function () {
+			_mongoose3.default.connection.on('disconnected', function () {
 				_logger2.default.log('info', 'Connector: Mongoose disconnected.');
 			});
 		}

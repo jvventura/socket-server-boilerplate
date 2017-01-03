@@ -36,14 +36,14 @@ class Connector extends events.EventEmitter {
 
 		mongoose.connect(this.urls.mongoose);
 
-		mongoose.conenction.on('connected', () => {  
+		mongoose.connection.on('connected', () => {  
 			logger.log('info', 'Connector: Mongoose connected.');
 			self._ready();
 		});
-		mongoose.conenction.on('error', err => {
+		mongoose.connection.on('error', err => {
 			logger.log('error', err);
 		});
-		mongoose.conenction.on('disconnected', () => {
+		mongoose.connection.on('disconnected', () => {
 			logger.log('info', 'Connector: Mongoose disconnected.');
 		});
 	}
