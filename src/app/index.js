@@ -12,7 +12,7 @@ class App extends events.EventEmitter {
 			mongoose: process.env.MONGODB_URI
 		});
 
-		this.connections.on('ready', this._onConnected);
+		this.connections.on('ready', this._onConnected.bind(this));
 	}
 
 	// 'Private' methods.
@@ -22,7 +22,7 @@ class App extends events.EventEmitter {
 		this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
 		*/
 		let self = this;
-		console.log(this.connections);
+
 		this.connections.queue.create('jobs.event', { prefetch: 5 }, () => {
 			self._onReady();
 		});

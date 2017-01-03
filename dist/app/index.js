@@ -55,7 +55,7 @@ var App = function (_events$EventEmitter) {
 			mongoose: process.env.MONGODB_URI
 		});
 
-		_this.connections.on('ready', _this._onConnected);
+		_this.connections.on('ready', _this._onConnected.bind(_this));
 		return _this;
 	}
 
@@ -68,7 +68,7 @@ var App = function (_events$EventEmitter) {
    this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
    */
 			var self = this;
-			console.log(this.connections);
+
 			this.connections.queue.create('jobs.event', { prefetch: 5 }, function () {
 				self._onReady();
 			});
