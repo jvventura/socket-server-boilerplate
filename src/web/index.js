@@ -3,8 +3,10 @@ import http from 'http';
 import express from 'express';
 import socketio from 'socket.io';
 import sharedSession from 'express-socket.io-session';
+import cookieParser from 'cookie-parser';
 
 import sessions from '../modules/sessions';
+import logger from '../modules/logger';
 
 function Web(app) {
 	// Instantiate server.
@@ -16,12 +18,12 @@ function Web(app) {
 	let session = sessions(process.env.REDISCLOUD_URL);
 	web.use(session);
 	web.use(cookieParser());
-	io.use(sharedsession(session, {
+	io.use(sharedSession(session, {
 	    autoSave:true
 	}));
 
 	io.on('connection', socket => {
-		/*
+/*
 		// user data scheme:
 			// user id, 'infinite' duration
 			// session id, session duration
@@ -42,17 +44,19 @@ function Web(app) {
 
 		function checkUser() {}
 		function checkSession() {}
-		*/
+*/
+		app.queue({event: 'socket_connection'});
 
-		socket.on('connect', () => {
-			app.queue({test:1});
-		});
 	});
+
+	setInterval(() => {
+		app.queue({event: 'interval'});
+	}, 5000);
 
 	// Start server.
 	let port = process.env.PORT || 5000;
 	server.listen(port, () => {
-		logger.log('info', 'Server listening on port %port', server.address().port);
+		logger.log('info', 'Server listening on port', server.address().port);
 	});
 
 	return server;

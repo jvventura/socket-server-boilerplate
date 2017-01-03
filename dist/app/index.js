@@ -51,11 +51,13 @@ var App = function (_events$EventEmitter) {
 		var _this = (0, _possibleConstructorReturn3.default)(this, (App.__proto__ || (0, _getPrototypeOf2.default)(App)).call(this));
 
 		_this.connections = (0, _connector2.default)({
-			jackrabbit: process.env.CLOUDAMQP_URL,
-			mongoose: process.env.MONGODB_URI
+			jackrabbit: process.env.CLOUDAMQP_URL || 'amqp://localhost',
+			mongoose: process.env.MONGODB_URI || 'mongodb://localhost:27017'
 		});
 
 		_this.connections.on('ready', _this._onConnected.bind(_this));
+
+		_this.rabbit;
 		return _this;
 	}
 
@@ -67,19 +69,14 @@ var App = function (_events$EventEmitter) {
 			/*
    this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
    */
-			var self = this;
 
-			_logger2.default.log('info', this.connections.queue);
-
-			this.connections.queue.create({
+			this.rabbit = this.connections.queue.queue({
 				name: 'jobs.event',
 				prefetch: 5,
 				durabe: true
 			});
 
-			this.connection.queue.queue.on('ready', function () {
-				self._onReady();
-			});
+			this._onReady();
 		}
 	}, {
 		key: '_onReady',
@@ -100,13 +97,14 @@ var App = function (_events$EventEmitter) {
 	}, {
 		key: 'queue',
 		value: function queue(data) {
-			this.connections.queue.publish('jobs.event', data);
+			this.connections.queue.publish(data, { key: 'jobs.event' });
 		}
 	}, {
 		key: 'process',
 		value: function process() {
-			this.connections.handle('jobs.event', function (job, ack) {
+			this.rabbit.consume(function (job, ack) {
 				_logger2.default.log('info', job);
+				ack();
 			});
 		}
 	}]);

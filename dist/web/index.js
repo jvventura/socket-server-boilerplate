@@ -20,9 +20,17 @@ var _expressSocket = require('express-socket.io-session');
 
 var _expressSocket2 = _interopRequireDefault(_expressSocket);
 
+var _cookieParser = require('cookie-parser');
+
+var _cookieParser2 = _interopRequireDefault(_cookieParser);
+
 var _sessions = require('../modules/sessions');
 
 var _sessions2 = _interopRequireDefault(_sessions);
+
+var _logger = require('../modules/logger');
+
+var _logger2 = _interopRequireDefault(_logger);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -35,41 +43,45 @@ function Web(app) {
 	// Connect to RedisStore for sessions.
 	var session = (0, _sessions2.default)(process.env.REDISCLOUD_URL);
 	web.use(session);
-	web.use(cookieParser());
-	io.use(sharedsession(session, {
+	web.use((0, _cookieParser2.default)());
+	io.use((0, _expressSocket2.default)(session, {
 		autoSave: true
 	}));
 
 	io.on('connection', function (socket) {
 		/*
-  // user data scheme:
-  	// user id, 'infinite' duration
-  	// session id, session duration
-  socket.on('connect', () => {
-  	if (!socket.handshake.session) {
-  		Function.compose(checkUser, checkSession); // dunno if this will work
-  		// if no user id supplied, generate a new one
-  		// if no session is supplied, generate a new one
-  	}
-  });
-  	socket.on('message', data => {
-  	// double check user and session!
-  	// validate message
-  	// call App.queueData
-  });
+  		// user data scheme:
+  			// user id, 'infinite' duration
+  			// session id, session duration
+  		socket.on('connect', () => {
+  			if (!socket.handshake.session) {
+  				Function.compose(checkUser, checkSession); // dunno if this will work
+  				// if no user id supplied, generate a new one
+  				// if no session is supplied, generate a new one
+  			}
+  		});
+  
+  		socket.on('message', data => {
+  			// double check user and session!
+  			// validate message
+  			// call App.queueData
+  		});
+  
+  
   		function checkUser() {}
-  function checkSession() {}
+  		function checkSession() {}
   */
-
-		socket.on('connect', function () {
-			app.queue({ test: 1 });
-		});
+		app.queue({ event: 'socket_connection' });
 	});
+
+	setInterval(function () {
+		app.queue({ event: 'interval' });
+	}, 5000);
 
 	// Start server.
 	var port = process.env.PORT || 5000;
 	server.listen(port, function () {
-		logger.log('info', 'Server listening on port %port', server.address().port);
+		_logger2.default.log('info', 'Server listening on port', server.address().port);
 	});
 
 	return server;
