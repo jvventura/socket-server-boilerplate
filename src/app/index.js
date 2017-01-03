@@ -23,7 +23,13 @@ class App extends events.EventEmitter {
 		*/
 		let self = this;
 
-		this.connections.queue.create('jobs.event', { prefetch: 5 }, () => {
+		this.connections.queue.queue({
+			name: 'jobs.event',
+			prefetch: 5,
+			durabe: true
+		});
+
+		this.connection.queue.queue.on('ready', () => {
 			self._onReady();
 		});
 	}

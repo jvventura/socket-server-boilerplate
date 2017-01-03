@@ -51,7 +51,7 @@ class Connector extends events.EventEmitter {
 	jackrabbit() {
 		let self = this;
 
-		return jackrabbit(this.urls.jackrabbit)
+		let rabbit = jackrabbit(this.urls.jackrabbit)
 		.on('connected', () => {
 			logger.log('info', 'Connector: Jackrabbit connected.');
 			self._ready();
@@ -63,6 +63,7 @@ class Connector extends events.EventEmitter {
 			logger.log('info', 'Connector: Jackrabbit disconnected.');
 			self._lost();
 		});
+		return rabbit.default();
 	}
 
 }

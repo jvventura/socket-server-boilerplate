@@ -69,7 +69,13 @@ var App = function (_events$EventEmitter) {
    */
 			var self = this;
 
-			this.connections.queue.create('jobs.event', { prefetch: 5 }, function () {
+			this.connections.queue.queue({
+				name: 'jobs.event',
+				prefetch: 5,
+				durabe: true
+			});
+
+			this.connection.queue.queue.on('ready', function () {
 				self._onReady();
 			});
 		}
