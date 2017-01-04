@@ -53,6 +53,10 @@ function Web(app) {
 
 	});
 
+	web.get('/test', (req, res) => {
+		res.send('../../test.html');
+	});
+
 	// Start server.
 	let port = process.env.PORT || 5000;
 	server.listen(port, () => {
