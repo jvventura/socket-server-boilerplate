@@ -4,7 +4,7 @@ var RedisStore = require('connect-redis')(expSession);
 module.exports = function Sessions(url) {
 	var store = new RedisStore({url:url});
 	var session = expSession({
-		secret: process.env.EXPRESS_SESSION_SECRET,
+		secret: process.env.EXPRESS_SESSION_SECRET || 'test',
 		store: store,
 		resave: true,
 		saveUninitialized: true,
