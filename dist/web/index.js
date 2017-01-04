@@ -71,6 +71,10 @@ function Web(app) {
 		//app.queue({event: 'socket_connection'});
 	});
 
+	web.get('/test', function (req, res) {
+		res.send('../../test.html');
+	});
+
 	// Start server.
 	var port = process.env.PORT || 5000;
 	server.listen(port, function () {
