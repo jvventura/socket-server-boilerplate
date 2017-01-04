@@ -72,7 +72,7 @@ function Web(app) {
 	});
 
 	web.get('/test', function (req, res) {
-		res.send('../../test.html');
+		res.sendFile('../../test.html');
 	});
 
 	// Start server.
