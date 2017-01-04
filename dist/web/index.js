@@ -16,10 +16,6 @@ var _socket = require('socket.io');
 
 var _socket2 = _interopRequireDefault(_socket);
 
-var _expressSocket = require('express-socket.io-session');
-
-var _expressSocket2 = _interopRequireDefault(_expressSocket);
-
 var _cookieParser = require('cookie-parser');
 
 var _cookieParser2 = _interopRequireDefault(_cookieParser);
@@ -44,34 +40,35 @@ function Web(app) {
 	var session = (0, _sessions2.default)(process.env.REDISCLOUD_URL);
 	web.use(session);
 	web.use((0, _cookieParser2.default)());
-	io.use((0, _expressSocket2.default)(session, {
-		autoSave: true
-	}));
+
+	io.use(function (socket, next) {
+		session(socket.request, socket.request.res, next);
+	});
 
 	io.on('connection', function (socket) {
+		if (!socket.request.session) {
+			_logger2.default.log('info', 'No socket session data, setting test prop.');
+			socket.request.session = {
+				test: 1
+			};
+		}
+
+		_logger2.default.log('info', socket.request.session);
 		/*
-  		// user data scheme:
-  			// user id, 'infinite' duration
-  			// session id, session duration
-  		socket.on('connect', () => {
-  			if (!socket.handshake.session) {
-  				Function.compose(checkUser, checkSession); // dunno if this will work
-  				// if no user id supplied, generate a new one
-  				// if no session is supplied, generate a new one
-  			}
-  		});
-  
-  		socket.on('message', data => {
-  			// double check user and session!
-  			// validate message
-  			// call App.queueData
-  		});
-  
-  
+  // user data scheme:
+  	// user id, 'infinite' duration
+  	// session id, session duration
+  socket.on('connect', () => {
+  	});
+  	socket.on('message', data => {
+  	// double check user and session!
+  	// validate message
+  	// call App.queueData
+  });
   		function checkUser() {}
-  		function checkSession() {}
+  function checkSession() {}
   */
-		app.queue({ event: 'socket_connection' });
+		//app.queue({event: 'socket_connection'});
 	});
 
 	// Start server.

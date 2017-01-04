@@ -2,7 +2,6 @@ import http from 'http';
 
 import express from 'express';
 import socketio from 'socket.io';
-import sharedSession from 'express-socket.io-session';
 import cookieParser from 'cookie-parser';
 
 import sessions from '../modules/sessions';
@@ -18,21 +17,26 @@ function Web(app) {
 	let session = sessions(process.env.REDISCLOUD_URL);
 	web.use(session);
 	web.use(cookieParser());
-	io.use(sharedSession(session, {
-	    autoSave:true
-	}));
+
+	io.use(function(socket, next) {
+    	session(socket.request, socket.request.res, next);
+	});
 
 	io.on('connection', socket => {
-/*
+		if (!socket.request.session) {
+			logger.log('info', 'No socket session data, setting test prop.');
+			socket.request.session = {
+				test: 1
+			};
+		}
+
+		logger.log('info', socket.request.session);
+		/*
 		// user data scheme:
 			// user id, 'infinite' duration
 			// session id, session duration
 		socket.on('connect', () => {
-			if (!socket.handshake.session) {
-				Function.compose(checkUser, checkSession); // dunno if this will work
-				// if no user id supplied, generate a new one
-				// if no session is supplied, generate a new one
-			}
+
 		});
 
 		socket.on('message', data => {
@@ -44,8 +48,8 @@ function Web(app) {
 
 		function checkUser() {}
 		function checkSession() {}
-*/
-		app.queue({event: 'socket_connection'});
+		*/
+		//app.queue({event: 'socket_connection'});
 
 	});
 
