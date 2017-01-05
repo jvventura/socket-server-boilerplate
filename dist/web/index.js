@@ -46,14 +46,15 @@ function Web(app) {
 	});
 
 	io.on('connection', function (socket) {
-		if (!socket.request.session) {
+		if (!socket.request.session.socket) {
 			_logger2.default.log('info', 'No socket session data, setting test prop.');
-			socket.request.session = {
+			socket.request.session.socket = {
 				test: 1
 			};
 		}
 
 		_logger2.default.log('info', socket.request.session);
+		_logger2.default.log('info', socket.request.session.socket);
 		/*
   // user data scheme:
   	// user id, 'infinite' duration
