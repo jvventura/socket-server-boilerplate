@@ -19,19 +19,19 @@ function Web(app) {
 	web.use(cookieParser());
 
 	io.use(function(socket, next) {
-    	session(socket.request, socket.request.res, next);
+    	session(socket.handshake, {}, next);
 	});
 
 	io.on('connection', socket => {
-		if (!socket.request.session.socket) {
+		if (!socket.handshake.session.socket) {
 			logger.log('info', 'No socket session data, setting test prop.');
-			socket.request.session.socket = {
+			socket.handshake.session.socket = {
 				test: 1
 			};
 		}
 
-		logger.log('info', socket.request.session);
-		logger.log('info', socket.request.session.socket);
+		logger.log('info', socket.handshake.session);
+		logger.log('info', socket.handshake.session.socket);
 		/*
 		// user data scheme:
 			// user id, 'infinite' duration
