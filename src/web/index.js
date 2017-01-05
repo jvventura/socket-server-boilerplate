@@ -28,6 +28,7 @@ function Web(app) {
 			socket.handshake.session.socket = {
 				test: 1
 			};
+			socket.handshake.session.save();
 		}
 
 		logger.log('info', socket.handshake.session);

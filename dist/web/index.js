@@ -51,6 +51,7 @@ function Web(app) {
 			socket.handshake.session.socket = {
 				test: 1
 			};
+			socket.handshake.session.save();
 		}
 
 		_logger2.default.log('info', socket.handshake.session);
