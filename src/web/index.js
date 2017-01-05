@@ -54,7 +54,7 @@ function Web(app) {
 	});
 
 	web.get('/test', (req, res) => {
-		res.sendFile('../../test.html');
+		res.sendFile('test.html', { root: __dirname });
 	});
 
 	// Start server.
