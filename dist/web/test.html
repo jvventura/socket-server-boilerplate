@@ -2,7 +2,33 @@
 	<head>
 		<script src='/socket.io/socket.io.js'></script>
 		<script>
-			let socket = io('https://socket-service-development.herokuapp.com/');
+			let socket = io();
+			let uuid = null;
+			
+			socket.on('hello', msg => {
+				if (!msg.uuid) {
+					console.log('No uuid in msg.');
+					return;
+				}
+				if (msg.uuid == uuid) {
+					console.log('uuid match!', msg.uuid, uuid);
+				} else {
+					console.log('uuid does not match! setting variable...', msg.uuid, uuid);
+					uuid = msg.uuid;
+				}
+				return;
+			});
+
+			setInterval(() => {
+				let eventObj = {
+					uuid: uuid,
+					data: {
+						type: 'test',
+						timestamp: Date.now()						
+					}					
+				};
+				socket.emit('event', eventObj);
+			}, 5000);
 		</script>
 	</head>
 </html>

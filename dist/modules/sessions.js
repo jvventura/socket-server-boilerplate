@@ -10,7 +10,10 @@ module.exports = function Sessions(url) {
 		store: store,
 		resave: true,
 		saveUninitialized: true,
-		cookie: { domain: '.joi-analytics.com' }
+		cookie: {
+			domain: !process.env.ENV ? 'localhost' : '.joi-analytics.com',
+			expires: new Date(2147483647000)
+		}
 	});
 
 	return session;

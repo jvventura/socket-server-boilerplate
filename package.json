@@ -29,15 +29,18 @@
   },
   "homepage": "https://github.com/jvventura/joianalytics-socket-service#readme",
   "dependencies": {
+    "aws-sdk": "^2.7.21",
     "babel-runtime": "^6.20.0",
     "connect-redis": "^3.2.0",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "jackrabbit": "^4.3.0",
+    "keen-tracking": "^1.0.3",
     "mongoose": "^4.7.5",
     "socket.io": "^1.7.2",
     "throng": "^4.0.0",
+    "uuid": "^3.0.1",
     "winston": "^2.3.0"
   },
   "devDependencies": {
