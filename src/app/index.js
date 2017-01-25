@@ -70,7 +70,7 @@ class App extends events.EventEmitter {
 			let eventName = job.type || 'unclassified';
 			let count = 2;
 
-			this.connections.queue.publish(job, {key: 'jobs.tracker'});
+			// Publish any "sub-jobs".
 			this.connections.queue.publish(job, {key: 'jobs.db'});
 
 			ack();
