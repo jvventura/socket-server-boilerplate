@@ -4,6 +4,11 @@
 		<script>
 			let socket = io();
 			let uuid = null;
+
+			socket.on('connect', () => {
+				console.log('emitting hello');
+				socket.emit('hello', 'Hi Socket! :)');
+			});
 			
 			socket.on('hello', msg => {
 				if (!msg.uuid) {
