@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nf start & npm run open",
+    "start": "nf start",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "open": "open http://localhost:5000",
+    "open": "open http://localhost:5000/test",
     "build": "babel src -s -D -d dist",
     "server": "node dist/server",
     "worker": "node dist/worker"
@@ -37,7 +37,6 @@
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "jackrabbit": "^4.3.0",
-    "keen-tracking": "^1.0.3",
     "mongoose": "^4.7.5",
     "socket.io": "^1.7.2",
     "throng": "^4.0.0",

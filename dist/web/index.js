@@ -62,6 +62,7 @@ function Web(app) {
 
 		socket.on('event', function (msg) {
 			_logger2.default.log('info', 'event, msg:', msg);
+			_logger2.default.log('info', socket.handshake.session);
 
 			if (!msg.uuid) {
 				_logger2.default.log('info', 'msg.uuid not specified.');
@@ -69,13 +70,12 @@ function Web(app) {
 					msg.uuid = socket.handshake.session.uuid;
 					_logger2.default.log('info', 'session.uuid used in lieu of msg.uuid.', socket.handshake.session.uuid);
 				} else {
-					_logger2.default.log('info');
 					uuidFlow(msg);
 					msg.uuid = socket.handshake.session.uuid;
 					_logger2.default.log('info', 'No session.uuid to use in lieu of msg.uuid. Passed to uuidFlow first to set session.uuid.');
 				}
 			}
-
+			socket.handshake.session.save();
 			var data = msg.data || {};
 			data.eventID = (0, _v2.default)();
 			app.queue(data);

@@ -44,6 +44,10 @@ var _config = require('../config');
 
 var _config2 = _interopRequireDefault(_config);
 
+var _EventModel = require('./EventModel');
+
+var _EventModel2 = _interopRequireDefault(_EventModel);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var App = function (_events$EventEmitter) {
@@ -56,13 +60,13 @@ var App = function (_events$EventEmitter) {
 
 		_this.connections = (0, _connector2.default)({
 			jackrabbit: _config2.default.connections.amqp,
-			keen: _config2.default.connections.keen
+			mongoose: _config2.default.connections.mongo
 		});
 
 		_this.connections.on('ready', _this._onConnected.bind(_this));
 
 		_this.rabbit = {};
-		_this.doc;
+		_this.db;
 		return _this;
 	}
 
@@ -85,14 +89,8 @@ var App = function (_events$EventEmitter) {
 				durabe: true
 			});
 
-			this.rabbit.tracker = this.connections.queue.queue({
-				name: 'jobs.tracker',
-				prefetch: 5,
-				durabe: true
-			});
-
-			// Instantiate DynamoDB document client for easy marshalling.
-			this.doc = this.connections.db.doc;
+			// Reference mongoose connection.
+			this.db = this.connections.db;
 
 			this._onReady();
 		}
@@ -134,26 +132,9 @@ var App = function (_events$EventEmitter) {
 				ack();
 			});
 
-			this.rabbit.tracker.consume(function (job, ack) {
-				var eventName = job.type || 'unclassified';
-
-				self.connections.tracker.recordEvent(eventName, job, function (err) {
-					if (err) {
-						_logger2.default.log('warn', 'App: tracker error.', err);
-						return;
-					} else {
-						_logger2.default.log('info', 'App: tracker processed event.', job);
-						ack();
-					}
-				});
-			});
-
 			this.rabbit.db.consume(function (job, ack) {
-				var param = {
-					Item: job,
-					TableName: 'events'
-				};
-				self.doc.put(param, function (err) {
+				var event = new _EventModel2.default(job);
+				event.save(function (err) {
 					if (err) {
 						_logger2.default.log('warn', 'App: db error.', err);
 						return;

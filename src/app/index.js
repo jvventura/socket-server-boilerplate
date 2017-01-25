@@ -5,19 +5,21 @@ import logger from '../modules/logger';
 
 import config from '../config';
 
+import Event from './EventModel';
+
 class App extends events.EventEmitter {
 	constructor() {
 		super();
 
 		this.connections = connections({
 			jackrabbit: config.connections.amqp,
-			keen: config.connections.keen
+			mongoose: config.connections.mongo
 		});
 
 		this.connections.on('ready', this._onConnected.bind(this));
 
 		this.rabbit = {};
-		this.doc;
+		this.db;
 	}
 
 	// 'Private' methods.
@@ -37,14 +39,9 @@ class App extends events.EventEmitter {
 			durabe: true
 		});
 
-		this.rabbit.tracker = this.connections.queue.queue({
-			name: 'jobs.tracker',
-			prefetch: 5,
-			durabe: true
-		});
+		// Reference mongoose connection.
+		this.db = this.connections.db;
 
-		// Instantiate DynamoDB document client for easy marshalling.
-		this.doc = this.connections.db.doc;
 
 		this._onReady();
 	}
@@ -79,26 +76,9 @@ class App extends events.EventEmitter {
 			ack();
 		});
 
-		this.rabbit.tracker.consume((job, ack) => {
-			let eventName = job.type || 'unclassified';
-
-			self.connections.tracker.recordEvent(eventName, job, err => {
-				if (err) {
-					logger.log('warn', 'App: tracker error.', err);
-					return;
-				} else {
-					logger.log('info', 'App: tracker processed event.', job);
-					ack();
-				}
-			});
-		});
-
 		this.rabbit.db.consume((job, ack) => {
-			let param = {
-				Item: job,
-				TableName: 'events'
-			};
-			self.doc.put(param, err => {
+			let event = new Event(job);
+			event.save(err => {
 				if (err) {
 					logger.log('warn', 'App: db error.', err);
 					return;
