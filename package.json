@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nf start",
+    "start": "nf start & npm run open",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "open": "open http://localhost:5000",
     "build": "babel src -s -D -d dist",
     "server": "node dist/server",
     "worker": "node dist/worker"
