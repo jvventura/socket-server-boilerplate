@@ -26,7 +26,7 @@ Start node-foreman:
 npm start
 ```
 
-Open browser to http://localhost:5000/test
+Open browser to [http://localhost:5000/test](localhost test endpoint).
 
 Watch the session cookie set and the events roll in. The worker should be logging:
 ```
