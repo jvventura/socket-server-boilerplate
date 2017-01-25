@@ -5,7 +5,7 @@ import App from './app';
 import logger from './modules/logger';
 
 http.globalAgent.maxSockets = Infinity;
-throng(start);
+throng({ workers: 1 }, start);
 
 function start() {
 	logger.log('info', 'Starting worker.');

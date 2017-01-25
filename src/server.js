@@ -7,10 +7,10 @@ import Web from './web';
 import logger from './modules/logger';
 
 http.globalAgent.maxSockets = Infinity;
-throng(start);
+throng({ workers: 1 }, start);
 
 function start() {
-	logger.log('info', 'Starting server.');
+	logger.log('info', 'Attempting to starting server.');
 
 	let instance = App();
 

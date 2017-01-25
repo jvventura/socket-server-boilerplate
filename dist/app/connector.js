@@ -32,13 +32,21 @@ var _events = require('events');
 
 var _events2 = _interopRequireDefault(_events);
 
-var _jackrabbit = require('jackrabbit');
+var _jackrabbit2 = require('jackrabbit');
 
-var _jackrabbit2 = _interopRequireDefault(_jackrabbit);
+var _jackrabbit3 = _interopRequireDefault(_jackrabbit2);
 
 var _mongoose = require('mongoose');
 
 var _mongoose2 = _interopRequireDefault(_mongoose);
+
+var _keenTracking = require('keen-tracking');
+
+var _keenTracking2 = _interopRequireDefault(_keenTracking);
+
+var _dynamodb = require('aws-sdk/clients/dynamodb');
+
+var _dynamodb2 = _interopRequireDefault(_dynamodb);
 
 var _logger = require('../modules/logger');
 
@@ -54,8 +62,12 @@ var Connector = function (_events$EventEmitter) {
 
 		var _this = (0, _possibleConstructorReturn3.default)(this, (Connector.__proto__ || (0, _getPrototypeOf2.default)(Connector)).call(this));
 
-		_this.count = 2;
+		_this.count = 3;
 		_this.urls = urls || {};
+
+		_this.db = _this.dynamoDB();
+		_this.queue = _this.jackrabbit();
+		_this.tracker = _this.keen();
 		return _this;
 	}
 
@@ -65,7 +77,7 @@ var Connector = function (_events$EventEmitter) {
 		key: '_ready',
 		value: function _ready() {
 			// Connection ready!
-			if (--this.count) {
+			if (--this.count == 0) {
 				this.emit('ready');
 			}
 		}
@@ -79,33 +91,64 @@ var Connector = function (_events$EventEmitter) {
 		// 'Public' methods.
 
 	}, {
-		key: 'db',
-		value: function db() {
+		key: 'dynamoDB',
+		value: function dynamoDB() {
 			var self = this;
 
-			return _mongoose2.default.connect(this.urls.mongoose).on('connected', function () {
-				_logger2.default.log('info', 'Connector: Mongoose connected.');
-				self._ready();
-			}).on('error', function (err) {
-				_logger2.default.log('error', err);
-			}).on('disconnected', function () {
-				_logger2.default.log('info', 'Connector: Mongoose disconnected.');
-			});
+			var client = new _dynamodb2.default();
+			client.doc = new _dynamodb2.default.DocumentClient({ region: 'us-west-2' });
+			_logger2.default.log('info', 'Connector: DynamoDB connected.');
+			self._ready();
+			return client;
 		}
+
+		/*
+  	mongoose() {
+  		let self = this;
+  
+  		mongoose.connect(this.urls.mongoose);
+  
+  		mongoose.connection.on('connected', () => {  
+  			logger.log('info', 'Connector: Mongoose connected.');
+  			self._ready();
+  		});
+  		mongoose.connection.on('error', err => {
+  			logger.log('error', err);
+  		});
+  		mongoose.connection.on('disconnected', () => {
+  			logger.log('info', 'Connector: Mongoose disconnected.');
+  		});
+  	}
+  */
+
 	}, {
-		key: 'queue',
-		value: function queue() {
+		key: 'jackrabbit',
+		value: function jackrabbit() {
 			var self = this;
 
-			return (0, _jackrabbit2.default)(this.urls.jackrabbit).on('connected', function () {
+			var rabbit = (0, _jackrabbit3.default)(this.urls.jackrabbit);
+			rabbit.on('connected', function () {
 				_logger2.default.log('info', 'Connector: Jackrabbit connected.');
 				self._ready();
-			}).on('error', function (err) {
+			});
+			rabbit.on('error', function (err) {
 				_logger2.default.log('error', err);
-			}).on('disconnected', function () {
+			});
+			rabbit.on('disconnected', function () {
 				_logger2.default.log('info', 'Connector: Jackrabbit disconnected.');
 				self._lost();
 			});
+			return rabbit.default();
+		}
+	}, {
+		key: 'keen',
+		value: function keen() {
+			var self = this;
+
+			var client = new _keenTracking2.default(this.urls.keen);
+			_logger2.default.log('info', 'Connector: Keen connected.');
+			self._ready();
+			return client;
 		}
 	}]);
 	return Connector;

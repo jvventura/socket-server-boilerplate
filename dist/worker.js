@@ -19,7 +19,7 @@ var _logger2 = _interopRequireDefault(_logger);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 _http2.default.globalAgent.maxSockets = Infinity;
-(0, _throng2.default)(start);
+(0, _throng2.default)({ workers: 1 }, start);
 
 function start() {
 	_logger2.default.log('info', 'Starting worker.');

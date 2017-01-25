@@ -40,6 +40,10 @@ var _logger = require('../modules/logger');
 
 var _logger2 = _interopRequireDefault(_logger);
 
+var _config = require('../config');
+
+var _config2 = _interopRequireDefault(_config);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var App = function (_events$EventEmitter) {
@@ -51,11 +55,14 @@ var App = function (_events$EventEmitter) {
 		var _this = (0, _possibleConstructorReturn3.default)(this, (App.__proto__ || (0, _getPrototypeOf2.default)(App)).call(this));
 
 		_this.connections = (0, _connector2.default)({
-			jackrabbit: process.env.CLOUDAMQP_URL,
-			mongoose: process.env.MONGODB_URI
+			jackrabbit: _config2.default.connections.amqp,
+			keen: _config2.default.connections.keen
 		});
 
-		_this.connections.on('ready', _this._onConnected);
+		_this.connections.on('ready', _this._onConnected.bind(_this));
+
+		_this.rabbit = {};
+		_this.doc;
 		return _this;
 	}
 
@@ -64,8 +71,30 @@ var App = function (_events$EventEmitter) {
 	(0, _createClass3.default)(App, [{
 		key: '_onConnected',
 		value: function _onConnected() {
-			this.Events = this.connections.db; // instantiate schema (or connection to whatever db);
-			this.connections.queue.create(this._onReady); // create the queue then emit ready event
+
+			// Setup jackrabbit queues.
+			this.rabbit.events = this.connections.queue.queue({
+				name: 'jobs.event',
+				prefetch: 5,
+				durabe: true
+			});
+
+			this.rabbit.db = this.connections.queue.queue({
+				name: 'jobs.db',
+				prefetch: 5,
+				durabe: true
+			});
+
+			this.rabbit.tracker = this.connections.queue.queue({
+				name: 'jobs.tracker',
+				prefetch: 5,
+				durabe: true
+			});
+
+			// Instantiate DynamoDB document client for easy marshalling.
+			this.doc = this.connections.db.doc;
+
+			this._onReady();
 		}
 	}, {
 		key: '_onReady',
@@ -86,13 +115,53 @@ var App = function (_events$EventEmitter) {
 	}, {
 		key: 'queue',
 		value: function queue(data) {
-			this.connections.queue.publish('jobs.event', data);
+			this.connections.queue.publish(data, { key: 'jobs.event' });
 		}
 	}, {
 		key: 'process',
 		value: function process() {
-			this.connections.handle('jobs.event', function (job, ack) {
-				_logger2.default.log('info', job);
+			var _this2 = this;
+
+			var self = this;
+
+			this.rabbit.events.consume(function (job, ack) {
+				var eventName = job.type || 'unclassified';
+				var count = 2;
+
+				_this2.connections.queue.publish(job, { key: 'jobs.tracker' });
+				_this2.connections.queue.publish(job, { key: 'jobs.db' });
+
+				ack();
+			});
+
+			this.rabbit.tracker.consume(function (job, ack) {
+				var eventName = job.type || 'unclassified';
+
+				self.connections.tracker.recordEvent(eventName, job, function (err) {
+					if (err) {
+						_logger2.default.log('warn', 'App: tracker error.', err);
+						return;
+					} else {
+						_logger2.default.log('info', 'App: tracker processed event.', job);
+						ack();
+					}
+				});
+			});
+
+			this.rabbit.db.consume(function (job, ack) {
+				var param = {
+					Item: job,
+					TableName: 'events'
+				};
+				self.doc.put(param, function (err) {
+					if (err) {
+						_logger2.default.log('warn', 'App: db error.', err);
+						return;
+					} else {
+						_logger2.default.log('info', 'App: db processed event.', job);
+						ack();
+					}
+				});
 			});
 		}
 	}]);
