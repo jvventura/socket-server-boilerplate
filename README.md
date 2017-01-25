@@ -3,9 +3,13 @@ Purpose
 For handling web socket connections with persistent user session.
 
 Handle socket connections with socket.io
+
 Handle HTTP router requests with express.
+
 Handle user session data with express-session middleware via Redis.
+
 Handle web-worker job queue with AMQP via rabbitmq.
+
 Handle mongodb connection via mongoose.
 
 Use
