@@ -17,6 +17,7 @@ Use
 Install dependencies:
 ```
 npm install
+npm install foreman -G
 ```
 
 Build: (should be pre-built)

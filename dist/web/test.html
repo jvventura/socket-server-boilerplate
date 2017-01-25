@@ -6,6 +6,7 @@
 			let uuid = null;
 
 			socket.on('connect', () => {
+				console.log('emitting hello');
 				socket.emit('hello', 'Hi Socket! :)');
 			});
 			
