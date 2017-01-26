@@ -1,7 +1,6 @@
 import events from 'events';
 import jackrabbit from 'jackrabbit';
 import mongoose from 'mongoose';
-import DynamoDB from 'aws-sdk/clients/dynamodb';
 
 import logger from '../modules/logger';
 

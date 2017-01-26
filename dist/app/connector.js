@@ -40,10 +40,6 @@ var _mongoose2 = require('mongoose');
 
 var _mongoose3 = _interopRequireDefault(_mongoose2);
 
-var _dynamodb = require('aws-sdk/clients/dynamodb');
-
-var _dynamodb2 = _interopRequireDefault(_dynamodb);
-
 var _logger = require('../modules/logger');
 
 var _logger2 = _interopRequireDefault(_logger);

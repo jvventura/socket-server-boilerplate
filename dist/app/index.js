@@ -126,7 +126,7 @@ var App = function (_events$EventEmitter) {
 				var eventName = job.type || 'unclassified';
 				var count = 2;
 
-				_this2.connections.queue.publish(job, { key: 'jobs.tracker' });
+				// Publish any "sub-jobs".
 				_this2.connections.queue.publish(job, { key: 'jobs.db' });
 
 				ack();
